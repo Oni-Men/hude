@@ -45,6 +45,14 @@ class Hude {
         return new Hude(c);
     }
 
+    static rad(v) {
+        return v * Math.PI / 180;
+    }
+
+    static deg(v) {
+        return v * 180 / Math.PI;
+    }
+
     get $c() {
         return this._c;
     }
@@ -177,6 +185,16 @@ class Hude {
         return this;
     }
 
+    ellipse(rx, ry, rotation) {
+        this.applyOriginOrder(this.localOriginOrder, rx, ry);
+
+        this._g.beginPath();
+        this._g.ellipse(0, 0, rx, ry, rotation, 0, 2 * Math.PI, 0);
+        this._g.closePath();
+
+        return this;
+    }
+
     roundRect(w, h, r) {
         this.applyOriginOrder(this.localOriginOrder, w / 2, h / 2);
 
@@ -287,6 +305,14 @@ class Hude {
         this._g.lineDashOffset = v.dashOffset ? v.dashOffset : 0.0;
         this._g.lineJoin = v.join ? v.join: 'miter';
         this._g.lineWidth = v.width ? v.width :  1.0;
+
+        return this;
+    }
+
+    alpha(v) {
+        if(v == undefined) return this;
+
+        this._g.globalAlpha = v;
 
         return this;
     }
