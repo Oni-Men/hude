@@ -45,12 +45,12 @@ class Hude {
         return new Hude(c);
     }
 
-    static rad(v) {
-        return v * Math.PI / 180;
+    static rad(deg) {
+        return deg * Math.PI / 180;
     }
 
-    static deg(v) {
-        return v * 180 / Math.PI;
+    static deg(rad) {
+        return rad * 180 / Math.PI;
     }
 
     get $c() {
@@ -165,11 +165,19 @@ class Hude {
         return this;
     }
 
-    circle(r) {
+    circle(r, x, y) {
         this.applyOriginOrder(this.localOriginOrder, r, r);
 
+        let _x = 0;
+        let _y = 0;
+
+        if(x !== undefined && y !== undefined) {
+            _x = x;
+            _y = y;
+        }
+
         this._g.beginPath();
-        this._g.arc(0, 0, r, 0, 2 * Math.PI);
+        this._g.arc(_x, _y, r, 0, 2 * Math.PI);
         this._g.closePath();
 
         return this;
@@ -242,7 +250,7 @@ class Hude {
         return this;
     }
 
-    text(t, align, baseline, font) {
+    text(t, align, baseline, font, type) {
         const tmpAlign = this._g.textAlign;
         const tmpBaseline = this._g.textBaseline;
         const tmpFont = this._g.font;
@@ -251,7 +259,11 @@ class Hude {
         if (baseline) this._g.textBaseline = baseline;
         if (font) this._g.font = font;
 
-        this._g.fillText(t, 0, 0);
+        if (!type || type == 'fill') {
+            this._g.fillText(t, 0, 0);
+        } else if(type == 'stroke') {
+            this._g.strokeText(t, 0, 0);
+        }
 
         this._g.textAlign = tmpAlign;
         this._g.textBaseline = tmpBaseline;
@@ -317,32 +329,68 @@ class Hude {
         return this;
     }
 
-    grid(x, y) {
-        const tmpTransform = this._g.currentTransform;
+    compositeOperation(v) {
+        if(v == undefined) return this;
 
-        this._g.setTransform(1, 0, 0, 1, 0, 0);
+        this._g.globalCompositeOperation = v;
+
+        return this;
+    }
+
+    begin() {
         this._g.beginPath();
 
-        for (let i = 0.5; i < x; i++) {
-            const dx = i * this.$w / x;
-            this._g.moveTo(dx, 0);
-            this._g.lineTo(dx, this.$h);
-        }
+        return this;
+    }
 
-        if (!y) {
-            this._g.closePath();
+    moveTo(x, y) {
+        this._g.moveTo(x, y);
 
-            return this;
-        }
+        return this;
+    }
 
-        for (let i = 0.5; i < y; i++) {
-            const dy = i * this.$h / y;
-            this._g.moveTo(0, dy);
-            this._g.lineTo(this.$w, dy);
-        }
+    lineTo(x, y) {
+        this._g.lineTo(x, y);
 
+        return this;
+    }
+
+    quadraticCurveTo(cpx, cpy, x, y) {
+        this._g.quadraticCurveTo(cpx, cpy, x, y);
+
+        return this;
+    }
+
+    close() {
         this._g.closePath();
-        this._g.currentTransform = tmpTransform;
+
+        return this;
+    }
+
+    loop(t, callback) {
+        for (let i = 0; i < t; i++) {
+            callback(this, i);
+        }
+
+        return this;
+    }
+
+    blur(iteration) {
+        let i = 0;
+        
+        const f = (src) => {
+            const c = document.createElement('canvas');
+            const g = Hude.build(src.width / 5, src.height / 5);
+            
+            g.center().scale(0.2, 0.2).$_g.drawImage(src, 0, 0, src.width, src.height, 0, 0, c.width, c.height);
+            
+            return c;
+        }
+
+        const blured = f(this.$c);
+
+        this._g.setTransform(1, 0, 0, 1, 0, 0,);
+        this._g.drawImage(blured, 0, 0, blured.width, blured.height, 0, 0, this.$w, this.$h);
 
         return this;
     }
