@@ -492,27 +492,6 @@ class Hude {
 
         return this;
     }
-
-    //WARNING!!! DON'T USE!!!!
-    blur(iteration) {
-        let i = 0;
-        
-        const f = (src) => {
-            const c = document.createElement('canvas');
-            const g = Hude.build(src.width / 5, src.height / 5);
-            
-            g.center().scale(0.2, 0.2).$_g.drawImage(src, 0, 0, src.width, src.height, 0, 0, c.width, c.height);
-            
-            return c;
-        }
-
-        const blured = f(this.$c);
-
-        this._g.setTransform(1, 0, 0, 1, 0, 0,);
-        this._g.drawImage(blured, 0, 0, blured.width, blured.height, 0, 0, this.$w, this.$h);
-
-        return this;
-    }
     
     _addMouseListener(type, func, mb) {
         this.$c.addEventListener(type, e => {
