@@ -73,10 +73,3 @@ console.log(height);
 123
 456
 ```
-
-## setterについて
-getterと同じようにsetterも存在しますが全て対応してるわけではありません。
-```js
-this.$w = 321;
-this.$h = 654;
-```
